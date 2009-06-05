@@ -1,0 +1,38 @@
+<div class="contextual">
+<%= link_to_remote l(:button_tag_add), 
+                   :url => {:controller => 'messages',
+                            :action => 'add_tags',
+                            :id => @topic} %>
+<%= link_to_remote l(:button_tag_delete), 
+	               :url => {:controller => 'messages',
+                         :action => 'delete_tags',
+                         :id => @topic} %>
+</div>
+<p><%= @tags.map {|tag| link_to tag.name, :project_id => @project.id, :controller => "boards", :action => "tag", :id => @board.id, :tag => tag.id}.join(' ')%></p>
+
+<% if params[:action] == "add_tags" and not @tags.nil? %>
+<% remote_form_for(:board_tag,
+                   :url => {:controller => 'messages',
+                            :action => 'add_tags',
+                            :id => @topic},
+                   :method => :post,
+                   :html => {:id => 'add-tags-form'}) do |f| %>
+  <%=l(:label_add_to_tag)%><%= f.text_field :name %><br>
+
+<%= submit_tag l(:button_create) %>
+<%= toggle_link l(:button_cancel), 'add-tags-form'%></p>
+<% end %>
+<% end %>
+<% if params[:action] == "delete_tags" and not @tags.nil? and @tags.size > 0 %>
+<% remote_form_for(:board_tag, @tags, 
+                   :url => {:controller => 'messages',
+                            :action => 'delete_tags',
+                            :id => @topic},
+                   :method => :post,
+                   :html => {:id => 'delete-tags-form'}) do |f| %>
+<%= f.select :id, @tags.map{|t|[t.name,t.id]} %>
+
+<%= submit_tag l(:button_delete) %>
+<%= toggle_link l(:button_cancel), 'delete-tags-form'%></p>
+<% end %>
+<% end %>
