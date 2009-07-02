@@ -14,13 +14,13 @@ class MessagesController < ApplicationController
   before_filter :find_tags, :except => [:new, :preview]
   def add_tags
     if not params[:board_tag].nil?
-      if not BoardTag.all(:conditions => {:name => params[:board_tag][:name]}).size > 0
+      if not BoardTag.first(:conditions => {:name => params[:board_tag][:name]})
         tag = BoardTag.new(params[:board_tag])
         tag.save
       else
         tag = BoardTag.first(:conditions => {:name => params[:board_tag][:name]})
       end
-      if MessageToTag.all(:conditions => {:board_id => @topic.board_id, :message_id => @topic.id, :board_tag_id => tag.id}).empty?
+      if not MessageToTag.first(:conditions => {:board_id => @topic.board_id, :message_id => @topic.id, :board_tag_id => tag.id})
         MessageToTag.create({
           :board_tag_id => tag.id,
           :message_id => @topic.id,
@@ -43,7 +43,7 @@ class MessagesController < ApplicationController
   
   def delete_tags
     if not params[:board_tag].nil?
-      if not BoardTag.all(:conditions => {:id => params[:board_tag][:id]}).size > 0
+      if not BoardTag.find_by_id(params[:board_tag][:id])
         tag = BoardTag.new
       else
         mtt = MessageToTag.first(:conditions => {:board_tag_id => params[:board_tag][:id], :message_id => @topic.id})
